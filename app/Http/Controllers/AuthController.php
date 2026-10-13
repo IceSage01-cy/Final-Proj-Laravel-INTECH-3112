@@ -11,13 +11,13 @@ use Inertia\Response;
 
 class AuthController extends Controller
 {
-    // Show the login page
+  
     public function create(): Response
     {
         return Inertia::render('auth/login');
     }
 
-    // Handle the login form
+ 
     public function store(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
