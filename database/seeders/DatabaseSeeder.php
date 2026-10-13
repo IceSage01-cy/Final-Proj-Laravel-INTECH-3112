@@ -15,6 +15,6 @@ class DatabaseSeeder extends Seeder
      */
    public function run(): void
 {
-    $this->call(InventoryDataSeeders::class);
+    $this->call(InventorySeeders::class);
 }
 }

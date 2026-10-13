@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
  * IDs are kept exactly as they were so products still point to the right
  * category and supplier. Run order matters (categories/suppliers before products).
  */
-class InventoryDataSeeders extends Seeder
+class InventorySeeders extends Seeder
 {
     public function run(): void
     {
