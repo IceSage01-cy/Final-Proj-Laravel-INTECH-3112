@@ -71,6 +71,22 @@ h1, h2, h3, h5, .modal-title {
     --bs-btn-active-color: var(--navy);
 }
 
+.unread-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--navy);
+    border-radius: 50%;
+    background: #dc3545;
+}
+
+.report-tabs {
+    display: flex;
+    gap: .5rem;
+}
+
 /* Navy table header (set through Bootstrap's table variables) */
 .table-primary {
     --bs-table-bg: var(--navy);

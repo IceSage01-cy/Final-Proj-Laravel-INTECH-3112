@@ -20,6 +20,7 @@ export default function Dashboard({
     categoryBreakdown,
     supplierStats,
     restockNeeded,
+    pendingReports,
 }) {
     return (
         <>
@@ -28,7 +29,15 @@ export default function Dashboard({
             <AppLayout
                 title="Admin Dashboard"
                 subtitle="Monitoring overview for the whole system"
-                actions={<Link href="/" className="btn btn-outline-light">Back to Inventory</Link>}
+                actions={<>
+                    <Link href="/admin/reports?view=employees" className="btn btn-outline-light position-relative">
+                        Employee Reports
+                        {pendingReports > 0 && <span className="unread-dot" title={`${pendingReports} report${pendingReports === 1 ? '' : 's'} awaiting review`} aria-label={`${pendingReports} unread employee reports`} />}
+                    </Link>
+                    <Link href="/admin/reports?view=products" className="btn btn-outline-light">Product Reports</Link>
+                    <Link href="/admin/employees" className="btn btn-outline-light">Manage Employees</Link>
+                    <Link href="/" className="btn btn-outline-light">Products</Link>
+                </>}
             >
                 <div className="card">
                     <div className="card-body">
