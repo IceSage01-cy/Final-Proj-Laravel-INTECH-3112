@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Supplier extends Model
 {
-    protected $primaryKey = 'suplier_id';
-    protected $fillable = ['suplier_name'];
+    protected $primaryKey = 'supplier_id';
+    protected $fillable = ['supplier_name'];
 
     public function products()
     {
-        return $this->hasMany(Product::class, 'suplier_id', 'suplier_id');
+        return $this->hasMany(Product::class, 'supplier_id', 'supplier_id');
     }
 }
