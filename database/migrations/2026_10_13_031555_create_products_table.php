@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id('product_id');
             $table->string('product_name', 255);
             $table->foreignID('category_id')->constrained('categories', 'category_id')->cascadeOnDelete();
-            $table->foreignID('suplier_id')->constrained('suppliers', 'suplier_id')->cascadeOnDelete();
+            $table->foreignID('supplier_id')->constrained('suppliers', 'supplier_id')->cascadeOnDelete();
             $table->integer('stock_qty')->default(0);
             $table->decimal('price', 10, 2)->default(0);
             $table->integer('low_stock_threshold')->default(10);
