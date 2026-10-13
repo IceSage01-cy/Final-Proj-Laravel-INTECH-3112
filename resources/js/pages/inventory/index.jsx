@@ -3,7 +3,6 @@ import { useMemo } from 'react';
 import AppLayout from '../../inventory/AppLayout';
 import { peso } from '../../inventory/format';
 
-// Decide the row color and badge from the stock numbers
 function stockInfo(p) {
     const qty = parseInt(p.stock_qty, 10) || 0;
     const threshold = Number(p.low_stock_threshold ?? 10);
