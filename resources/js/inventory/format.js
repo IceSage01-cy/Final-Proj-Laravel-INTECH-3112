@@ -1,0 +1,1 @@
+export const peso = (n) => '₱ ' + Number(n || 0).toLocaleString();
