@@ -69,7 +69,7 @@ export default function Login() {
                                         </button>
                                     </div>
                                     <div className="d-flex justify-content-between mt-3">
-                                        <Link href="/register">Create account</Link>
+                                        <Link href="/register">Create Employee account</Link>
                                         <Link href="/forgot-password">Forgot password?</Link>
                                     </div>
                                 </form>

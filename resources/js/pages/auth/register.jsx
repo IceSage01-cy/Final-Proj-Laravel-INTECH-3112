@@ -23,10 +23,10 @@ export default function Register() {
 
     return (
         <>
-            <Head title="Register" />
+            <Head title="Create Employee account" />
             <div className="login-page"><div className="container"><div className="row justify-content-center">
                 <div className="col-md-5 col-lg-4"><div className="login-card shadow-sm bg-white">
-                    <div className="login-header text-white"><h2 className="fw-bold mb-1">Create account</h2></div>
+                    <div className="login-header text-white"><h2 className="fw-bold mb-1">Create Employee account</h2></div>
                     <form className="p-4" onSubmit={submit}>
                         {field('username', 'Username')}
                         {field('email', 'Email', 'email')}

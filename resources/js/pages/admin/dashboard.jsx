@@ -41,6 +41,7 @@ export default function Dashboard({
                         <Link href="/admin/reports?view=products" className="btn btn-outline-light">Product Reports</Link>
                     </>}
                     {can('employees.view') && <Link href="/admin/employees" className="btn btn-outline-light">Manage Employees</Link>}
+                    {can('managers.view') &&<Link href="/admin/managers" className="btn btn-outline-light">Manage Product Managers</Link>}
                     {can('products.view') && <Link href="/" className="btn btn-outline-light">Products</Link>}
                 </>}
             >
