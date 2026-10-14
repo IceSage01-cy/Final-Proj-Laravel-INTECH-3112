@@ -19,7 +19,12 @@ class ReportController extends Controller
             ->where('report_month', $month)
             ->first();
 
-        return Inertia::render('reports/monthly', compact('year', 'month', 'report'));
+        $history = MonthlyReport::where('user_id', $request->user()->user_id)
+            ->orderByDesc('report_year')
+            ->orderByDesc('report_month')
+            ->get(['id', 'report_year', 'report_month', 'hours_worked', 'status', 'updated_at']);
+
+        return Inertia::render('reports/monthly', compact('year', 'month', 'report', 'history'));
     }
 
     public function store(Request $request): RedirectResponse
@@ -30,6 +35,9 @@ class ReportController extends Controller
             ->where('report_year', $year)
             ->where('report_month', $month)
             ->first();
+
+        // Creating a new report and editing an existing one are separate permissions.
+        abort_unless($request->user()->can($existing ? 'reports.update' : 'reports.create'), 403);
 
         if ($existing?->status === 'submitted' || $existing?->status === 'reviewed') {
             return back()->with('error', 'Submitted and reviewed reports cannot be edited.');
@@ -54,6 +62,19 @@ class ReportController extends Controller
         $report->update(['status' => 'submitted']);
 
         return back()->with('success', 'Monthly report submitted for review.');
+    }
+
+    public function destroy(Request $request, MonthlyReport $report): RedirectResponse
+    {
+        $this->ensureOwner($request, $report);
+
+        if ($report->status !== 'draft') {
+            return back()->with('error', 'Only draft reports can be deleted.');
+        }
+
+        $report->delete();
+
+        return back()->with('success', 'Draft report deleted.');
     }
 
     public function adminIndex(Request $request): Response

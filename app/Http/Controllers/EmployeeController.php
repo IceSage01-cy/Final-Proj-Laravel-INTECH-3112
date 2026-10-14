@@ -14,7 +14,7 @@ class EmployeeController extends Controller
     public function index(): Response
     {
         return Inertia::render('admin/employees', [
-            'employees' => User::where('role', 'employee')
+            'employees' => User::role('employee')
                 ->latest()
                 ->get(['user_id', 'username', 'created_at']),
         ]);
@@ -30,15 +30,14 @@ class EmployeeController extends Controller
         User::create([
             'username' => $data['username'],
             'password' => $data['password'],
-            'role'     => 'employee',
-        ]);
+        ])->assignRole('employee');
 
         return back()->with('success', 'Employee account created successfully.');
     }
 
     public function destroy(User $employee): RedirectResponse
     {
-        if ($employee->role !== 'employee') {
+        if (! $employee->hasRole('employee')) {
             return back()->with('error', 'Only employee accounts can be deleted.');
         }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
+use Spatie\Permission\Models\Role;
 
 class CreateNewUser implements CreatesNewUsers
 {
@@ -28,10 +29,15 @@ class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
+        $user = User::create([
             'username' => $input['username'],
             'email'    => $input['email'],
             'password' => $input['password'],
         ]);
+
+        // Self-registered accounts are always plain employees.
+        $user->assignRole(Role::findOrCreate('employee', 'web'));
+
+        return $user;
     }
 }

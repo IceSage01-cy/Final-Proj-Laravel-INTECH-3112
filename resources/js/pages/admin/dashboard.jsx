@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '../../inventory/AppLayout';
 import { peso } from '../../inventory/format';
+import { useCan } from '../../inventory/permissions';
 
 function Stat({ label, value, color }) {
     return (
@@ -22,6 +23,8 @@ export default function Dashboard({
     restockNeeded,
     pendingReports,
 }) {
+    const can = useCan();
+
     return (
         <>
             <Head title="Admin Dashboard" />
@@ -30,13 +33,15 @@ export default function Dashboard({
                 title="Admin Dashboard"
                 subtitle="Monitoring overview for the whole system"
                 actions={<>
-                    <Link href="/admin/reports?view=employees" className="btn btn-outline-light position-relative">
-                        Employee Reports
-                        {pendingReports > 0 && <span className="unread-dot" title={`${pendingReports} report${pendingReports === 1 ? '' : 's'} awaiting review`} aria-label={`${pendingReports} unread employee reports`} />}
-                    </Link>
-                    <Link href="/admin/reports?view=products" className="btn btn-outline-light">Product Reports</Link>
-                    <Link href="/admin/employees" className="btn btn-outline-light">Manage Employees</Link>
-                    <Link href="/" className="btn btn-outline-light">Products</Link>
+                    {can('reports.view-all') && <>
+                        <Link href="/admin/reports?view=employees" className="btn btn-outline-light position-relative">
+                            Employee Reports
+                            {pendingReports > 0 && <span className="unread-dot" title={`${pendingReports} report${pendingReports === 1 ? '' : 's'} awaiting review`} aria-label={`${pendingReports} unread employee reports`} />}
+                        </Link>
+                        <Link href="/admin/reports?view=products" className="btn btn-outline-light">Product Reports</Link>
+                    </>}
+                    {can('employees.view') && <Link href="/admin/employees" className="btn btn-outline-light">Manage Employees</Link>}
+                    {can('products.view') && <Link href="/" className="btn btn-outline-light">Products</Link>}
                 </>}
             >
                 <div className="card">

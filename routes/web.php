@@ -17,25 +17,43 @@ use Illuminate\Support\Facades\Route;
 //     ->middleware('auth')
 //     ->name('logout');
 
-// Everything below needs a logged-in user
+// Everything below needs a logged-in user. Access is decided by the
+// permission each role is given in RolesAndPermissionsSeeder.
 Route::middleware('auth')->group(function () {
-    // Inventory page: admins and employees
-    Route::get('/', [ProductController::class, 'index'])->name('products.index');
+    // Inventory
+    Route::get('/', [ProductController::class, 'index'])
+        ->middleware('permission:products.view')
+        ->name('products.index');
+    Route::post('/products', [ProductController::class, 'store'])
+        ->middleware('permission:products.create');
 
-    Route::middleware('role:employee')->group(function () {
-        Route::get('/reports/monthly', [ReportController::class, 'index'])->name('reports.monthly');
-        Route::post('/reports/monthly', [ReportController::class, 'store']);
-        Route::post('/reports/monthly/{report}/submit', [ReportController::class, 'submit']);
-    });
+    // Employee: own monthly reports
+    Route::get('/reports/monthly', [ReportController::class, 'index'])
+        ->middleware('permission:reports.view-own')
+        ->name('reports.monthly');
+    Route::post('/reports/monthly', [ReportController::class, 'store'])
+        ->middleware('permission:reports.create|reports.update');
+    Route::post('/reports/monthly/{report}/submit', [ReportController::class, 'submit'])
+        ->middleware('permission:reports.update');
+    Route::delete('/reports/monthly/{report}', [ReportController::class, 'destroy'])
+        ->middleware('permission:reports.delete');
 
-    // Admin only
-    Route::middleware('role:admin')->group(function () {
-        Route::get('/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('/admin/reports', [ReportController::class, 'adminIndex'])->name('admin.reports');
-        Route::post('/admin/reports/{report}/review', [ReportController::class, 'review']);
-        Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees');
-        Route::post('/admin/employees', [EmployeeController::class, 'store']);
-        Route::delete('/admin/employees/{employee}', [EmployeeController::class, 'destroy']);
-        Route::post('/products', [ProductController::class, 'store']);
-    });
+    // Product manager: everyone's monthly reports
+    Route::get('/admin/reports', [ReportController::class, 'adminIndex'])
+        ->middleware('permission:reports.view-all')
+        ->name('admin.reports');
+    Route::post('/admin/reports/{report}/review', [ReportController::class, 'review'])
+        ->middleware('permission:reports.review');
+
+    // Super admin: analytics dashboard and employee accounts
+    Route::get('/admin', [AdminDashboardController::class, 'index'])
+        ->middleware('permission:dashboard.view')
+        ->name('admin.dashboard');
+    Route::get('/admin/employees', [EmployeeController::class, 'index'])
+        ->middleware('permission:employees.view')
+        ->name('admin.employees');
+    Route::post('/admin/employees', [EmployeeController::class, 'store'])
+        ->middleware('permission:employees.create');
+    Route::delete('/admin/employees/{employee}', [EmployeeController::class, 'destroy'])
+        ->middleware('permission:employees.delete');
 });

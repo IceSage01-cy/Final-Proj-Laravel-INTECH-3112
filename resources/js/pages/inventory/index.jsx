@@ -2,6 +2,7 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 import AppLayout from '../../inventory/AppLayout';
 import { peso } from '../../inventory/format';
+import { useCan } from '../../inventory/permissions';
 
 function stockInfo(p) {
     const qty = parseInt(p.stock_qty, 10) || 0;
@@ -19,7 +20,8 @@ function stockInfo(p) {
 export default function Index({ products }) {
     const { auth } = usePage().props;
     const user = auth?.user;
-    const isAdmin = user?.role === 'admin';
+    const can = useCan();
+    const canAddProducts = can('products.create');
     const form = useForm({
         productName: '', categoryName: '', supplierName: '', stockQty: 0, price: '', lowStockThreshold: 10,
     });
@@ -42,11 +44,13 @@ export default function Index({ products }) {
             <AppLayout
                 title="Inventory Management System"
                 subtitle={user ? `Signed in as ${user.username} (${user.role})` : null}
-                actions={isAdmin
-                    ? <Link href="/admin" className="btn btn-outline-light">Admin Dashboard</Link>
-                    : <Link href="/reports/monthly" className="btn btn-outline-light">My Monthly Report</Link>}
+                actions={<>
+                    {can('dashboard.view') && <Link href="/admin" className="btn btn-outline-light">Admin Dashboard</Link>}
+                    {can('reports.view-all') && <Link href="/admin/reports" className="btn btn-outline-light">Monthly Reports</Link>}
+                    {can('reports.view-own') && <Link href="/reports/monthly" className="btn btn-outline-light">My Monthly Report</Link>}
+                </>}
             >
-                {isAdmin && (
+                {canAddProducts && (
                     <div className="card mb-4">
                         <div className="card-body">
                             <h5 className="section-title">Add Product</h5>
