@@ -6,11 +6,25 @@ use App\Models\MonthlyReport;
 use App\Support\InventoryQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ReportController extends Controller
+class ReportController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:reports.view-own', only: ['index']),
+            new Middleware('permission:reports.create|reports.update', only: ['store']),
+            new Middleware('permission:reports.update', only: ['submit']),
+            new Middleware('permission:reports.delete', only: ['destroy']),
+            new Middleware('permission:reports.view-all', only: ['adminIndex']),
+            new Middleware('permission:reports.review', only: ['review']),
+        ];
+    }
+
     public function index(Request $request): Response
     {
         [$year, $month] = $this->period($request);

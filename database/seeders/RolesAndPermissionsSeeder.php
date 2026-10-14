@@ -25,14 +25,28 @@ class RolesAndPermissionsSeeder extends Seeder
         $matrix = [
             self::SUPER_ADMIN => [
                 'dashboard.view',
+                'managers.view',
+                'managers.create',
+                'managers.delete',
                 'employees.view',
-                'employees.create',
                 'employees.delete',
                 'products.view',
+                'categories.view',
+                'suppliers.view',
             ],
             self::PRODUCT_MANAGER => [
                 'products.view',
                 'products.create',
+                'products.update',
+                'products.delete',
+                'categories.view',
+                'categories.create',
+                'categories.update',
+                'categories.delete',
+                'suppliers.view',
+                'suppliers.create',
+                'suppliers.update',
+                'suppliers.delete',
                 'reports.view-all',
                 'reports.review',
             ],
@@ -56,6 +70,9 @@ class RolesAndPermissionsSeeder extends Seeder
         foreach ($matrix as $role => $permissions) {
             Role::findOrCreate($role, 'web')->syncPermissions($permissions);
         }
+
+        // Employees register themselves, so the super admin no longer creates them.
+        Permission::where('name', 'employees.create')->delete();
 
         $this->seedAccounts();
 
