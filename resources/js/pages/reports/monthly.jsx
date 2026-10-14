@@ -108,7 +108,7 @@ function History({ history }) {
                                                 onClick={() => router.get('/reports/monthly', { period })}>
                                                 {entry.status === 'draft' ? 'Edit' : 'View'}
                                             </button>
-                                            {entry.status === 'draft' && can('reports.delete') && (
+                                            {entry.status === 'draft' && can('reports.delete-own') && (
                                                 <button type="button" className="btn btn-sm btn-outline-danger" onClick={() => remove(entry)}>Delete</button>
                                             )}
                                         </td>
@@ -130,7 +130,6 @@ export default function Monthly({ year, month, report, history }) {
             <AppLayout
                 title="My Monthly Report"
                 subtitle="Prepare and submit your monthly accomplishments"
-                actions={<a href="/" className="btn btn-outline-light">Inventory</a>}
             >
                 {/* key remounts the form when the period or report changes, so stale text never lingers */}
                 <ReportForm key={`${year}-${month}-${report?.id ?? 'new'}-${report?.status ?? ''}`} year={year} month={month} report={report} />

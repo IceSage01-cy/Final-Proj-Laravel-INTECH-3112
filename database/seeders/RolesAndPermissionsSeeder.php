@@ -22,40 +22,44 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
+        // Everything the product manager can do, so the admin can do too.
+        $inventory = [
+            'products.view',
+            'products.create',
+            'products.update',
+            'products.delete',
+            'categories.view',
+            'categories.create',
+            'categories.update',
+            'categories.delete',
+            'suppliers.view',
+            'suppliers.create',
+            'suppliers.update',
+            'suppliers.delete',
+            // view / review / delete the monthly reports employees make
+            'reports.view-all',
+            'reports.review',
+            'reports.delete',
+        ];
+
         $matrix = [
             self::ADMIN => [
+                ...$inventory,
                 'dashboard.view',
                 'managers.view',
                 'managers.create',
                 'managers.delete',
                 'employees.view',
                 'employees.delete',
-                'products.view',
-                'categories.view',
-                'suppliers.view',
             ],
-            self::PRODUCT_MANAGER => [
-                'products.view',
-                'products.create',
-                'products.update',
-                'products.delete',
-                'categories.view',
-                'categories.create',
-                'categories.update',
-                'categories.delete',
-                'suppliers.view',
-                'suppliers.create',
-                'suppliers.update',
-                'suppliers.delete',
-                'reports.view-all',
-                'reports.review',
-            ],
+            self::PRODUCT_MANAGER => $inventory,
+            // Employees only write and read their own monthly reports (and may
+            // delete their own drafts, never a submitted one).
             self::EMPLOYEE => [
-                'products.view',
                 'reports.view-own',
                 'reports.create',
                 'reports.update',
-                'reports.delete',
+                'reports.delete-own',
             ],
         ];
 

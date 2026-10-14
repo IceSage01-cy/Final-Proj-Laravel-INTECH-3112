@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 // Admin only. The role gate blocks everyone else outright; each controller
 // still checks the specific permission for its action.
-Route::prefix('admin')->name('admin.')->middleware('role:super-admin')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     // Analytics dashboard
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 

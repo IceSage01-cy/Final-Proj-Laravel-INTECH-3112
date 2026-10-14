@@ -9,12 +9,13 @@ Route::prefix('reports/monthly')->name('reports.monthly.')->middleware('role:emp
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
         Route::post('/{report}/submit', 'submit')->name('submit');
-        Route::delete('/{report}', 'destroy')->name('destroy');
+        Route::delete('/{report}', 'destroyOwn')->name('destroy');
     });
 
-// Product manager: everyone's monthly reports
-Route::prefix('admin/reports')->name('admin.reports.')->middleware('role:product-manager')
+// Admin and product manager: everyone's monthly reports
+Route::prefix('admin/reports')->name('admin.reports.')->middleware('role:admin|product-manager')
     ->controller(ReportController::class)->group(function () {
         Route::get('/', 'adminIndex')->name('index');
         Route::post('/{report}/review', 'review')->name('review');
+        Route::delete('/{report}', 'destroy')->name('destroy');
     });

@@ -10,6 +10,11 @@ function EmptyRow({ colSpan, children = 'No records found.' }) {
 export default function Reports({ year, month, view, reports, pendingReports, inventorySummary, newProducts, restockNeeded }) {
     const can = useCan();
     const period = `${year}-${String(month).padStart(2, '0')}`;
+    const remove = (report) => {
+        if (window.confirm(`Delete the report by ${report.employee?.username ?? 'this employee'}?`)) {
+            router.delete(`/admin/reports/${report.id}`, { preserveScroll: true });
+        }
+    };
     const changeView = (nextView) => router.get('/admin/reports', { period, view: nextView });
 
     return (
@@ -107,7 +112,10 @@ export default function Reports({ year, month, view, reports, pendingReports, in
                                             <td className="text-wrap" style={{ minWidth: 220 }}>{report.accomplishments}</td>
                                             <td className="text-wrap">{report.notes || '—'}</td>
                                             <td><span className="badge bg-secondary">{report.status}</span></td>
-                                            <td>{report.status === 'submitted' && can('reports.review') && <button className="btn btn-sm btn-success" onClick={() => router.post(`/admin/reports/${report.id}/review`)}>Mark Reviewed</button>}</td>
+                                            <td className="text-nowrap">
+                                                {report.status === 'submitted' && can('reports.review') && <button className="btn btn-sm btn-success me-2" onClick={() => router.post(`/admin/reports/${report.id}/review`)}>Mark Reviewed</button>}
+                                                {can('reports.delete') && <button className="btn btn-sm btn-outline-danger" onClick={() => remove(report)}>Delete</button>}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

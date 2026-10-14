@@ -19,8 +19,9 @@ class ReportController extends Controller implements HasMiddleware
             new Middleware('permission:reports.view-own', only: ['index']),
             new Middleware('permission:reports.create|reports.update', only: ['store']),
             new Middleware('permission:reports.update', only: ['submit']),
-            new Middleware('permission:reports.delete', only: ['destroy']),
+            new Middleware('permission:reports.delete-own', only: ['destroyOwn']),
             new Middleware('permission:reports.view-all', only: ['adminIndex']),
+            new Middleware('permission:reports.delete', only: ['destroy']),
             new Middleware('permission:reports.review', only: ['review']),
         ];
     }
@@ -78,7 +79,7 @@ class ReportController extends Controller implements HasMiddleware
         return back()->with('success', 'Monthly report submitted for review.');
     }
 
-    public function destroy(Request $request, MonthlyReport $report): RedirectResponse
+    public function destroyOwn(Request $request, MonthlyReport $report): RedirectResponse
     {
         $this->ensureOwner($request, $report);
 
@@ -89,6 +90,13 @@ class ReportController extends Controller implements HasMiddleware
         $report->delete();
 
         return back()->with('success', 'Draft report deleted.');
+    }
+
+    public function destroy(MonthlyReport $report): RedirectResponse
+    {
+        $report->delete();
+
+        return back()->with('success', 'Monthly report deleted.');
     }
 
     public function adminIndex(Request $request): Response

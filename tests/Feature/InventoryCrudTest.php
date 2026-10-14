@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Category;
+use App\Models\MonthlyReport;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\User;
@@ -75,17 +76,99 @@ class InventoryCrudTest extends TestCase
             ->assertSessionHasErrors(['product_name', 'category_id', 'supplier_id', 'price']);
     }
 
-    public function test_employee_can_view_but_not_change_products(): void
+    public function test_employee_has_no_inventory_access(): void
     {
         $employee = $this->userWithRole('employee');
         $product = $this->product();
 
-        $this->actingAs($employee)->get('/products')->assertOk();
-        $this->actingAs($employee)->get("/products/{$product->product_id}")->assertOk();
-        $this->actingAs($employee)->get('/products/create')->assertForbidden();
+        $this->actingAs($employee)->get('/')->assertRedirect('/reports/monthly');
+        $this->actingAs($employee)->get('/products')->assertForbidden();
+        $this->actingAs($employee)->get("/products/{$product->product_id}")->assertForbidden();
         $this->actingAs($employee)->post('/products', $this->payload($product))->assertForbidden();
-        $this->actingAs($employee)->put("/products/{$product->product_id}", $this->payload($product))->assertForbidden();
         $this->actingAs($employee)->delete("/products/{$product->product_id}")->assertForbidden();
+        $this->actingAs($employee)->get('/categories')->assertForbidden();
+        $this->actingAs($employee)->get('/suppliers')->assertForbidden();
+    }
+
+    public function test_admin_has_every_product_manager_operation(): void
+    {
+        $admin = $this->userWithRole('admin');
+        $product = $this->product();
+
+        $this->actingAs($admin)->get('/')->assertRedirect('/products');
+        $this->actingAs($admin)->post('/products', $this->payload($product))->assertRedirect('/products');
+        $this->actingAs($admin)->put("/products/{$product->product_id}", $this->payload($product, ['product_name' => 'Renamed']))
+            ->assertRedirect('/products');
+        $this->actingAs($admin)->delete("/products/{$product->product_id}")->assertRedirect('/products');
+        $this->assertDatabaseMissing('products', ['product_id' => $product->product_id]);
+
+        $this->actingAs($admin)->post('/categories', ['category_name' => 'Gadgets'])->assertSessionHasNoErrors();
+        $this->actingAs($admin)->post('/suppliers', ['supplier_name' => 'Acme'])->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('categories', ['category_name' => 'Gadgets']);
+        $this->assertDatabaseHas('suppliers', ['supplier_name' => 'Acme']);
+    }
+
+    public function test_admin_and_manager_can_delete_employee_reports_but_employees_cannot(): void
+    {
+        $employee = $this->userWithRole('employee');
+        $report = fn () => MonthlyReport::create([
+            'user_id' => $employee->user_id,
+            'report_year' => 2026,
+            'report_month' => random_int(1, 12),
+            'accomplishments' => 'Did things',
+            'hours_worked' => 40,
+            'status' => 'submitted',
+        ]);
+
+        $this->actingAs($this->userWithRole('admin'))->get('/admin/reports')->assertOk();
+        $this->actingAs($this->userWithRole('product-manager'))->get('/admin/reports')->assertOk();
+
+        $first = $report();
+        $this->actingAs($employee)->delete("/admin/reports/{$first->id}")->assertForbidden();
+        $this->assertDatabaseHas('monthly_reports', ['id' => $first->id]);
+
+        $this->actingAs($this->userWithRole('admin'))->delete("/admin/reports/{$first->id}");
+        $this->assertDatabaseMissing('monthly_reports', ['id' => $first->id]);
+
+        $second = MonthlyReport::create([...$first->only(['user_id', 'accomplishments', 'hours_worked']),
+            'report_year' => 2025, 'report_month' => 1, 'status' => 'reviewed']);
+        $this->actingAs($this->userWithRole('product-manager'))->delete("/admin/reports/{$second->id}");
+        $this->assertDatabaseMissing('monthly_reports', ['id' => $second->id]);
+    }
+
+    public function test_employee_can_delete_own_drafts_but_not_submitted_reports(): void
+    {
+        $employee = $this->userWithRole('employee');
+        $other = $this->userWithRole('employee');
+        $make = fn (User $user, int $month, string $status) => MonthlyReport::create([
+            'user_id' => $user->user_id,
+            'report_year' => 2026,
+            'report_month' => $month,
+            'accomplishments' => 'Did things',
+            'hours_worked' => 40,
+            'status' => $status,
+        ]);
+
+        $draft = $make($employee, 1, 'draft');
+        $submitted = $make($employee, 2, 'submitted');
+        $othersDraft = $make($other, 1, 'draft');
+
+        $this->actingAs($employee)->delete("/reports/monthly/{$draft->id}");
+        $this->assertDatabaseMissing('monthly_reports', ['id' => $draft->id]);
+
+        $this->actingAs($employee)->delete("/reports/monthly/{$submitted->id}")->assertSessionHas('error');
+        $this->assertDatabaseHas('monthly_reports', ['id' => $submitted->id]);
+
+        $this->actingAs($employee)->delete("/reports/monthly/{$othersDraft->id}")->assertForbidden();
+        $this->assertDatabaseHas('monthly_reports', ['id' => $othersDraft->id]);
+    }
+
+    public function test_managers_cannot_reach_admin_only_pages(): void
+    {
+        $manager = $this->userWithRole('product-manager');
+
+        $this->actingAs($manager)->get('/admin/managers')->assertForbidden();
+        $this->actingAs($manager)->get('/admin/employees')->assertForbidden();
     }
 
     public function test_category_names_are_unique_and_categories_with_products_are_kept(): void
@@ -164,15 +247,5 @@ class InventoryCrudTest extends TestCase
         $this->actingAs($admin)->post('/admin/managers', ['username' => 'mgr', 'password' => 'a-Strong-pass-123'])
             ->assertSessionHasNoErrors();
         $this->assertTrue(User::where('username', 'mgr')->first()->hasRole('product-manager'));
-    }
-
-    public function test_only_product_managers_manage_categories(): void
-    {
-        $employee = $this->userWithRole('employee');
-        $admin = $this->userWithRole('admin');
-
-        $this->actingAs($employee)->get('/categories')->assertForbidden();
-        $this->actingAs($admin)->get('/categories')->assertOk();
-        $this->actingAs($admin)->post('/categories', ['category_name' => 'New'])->assertForbidden();
     }
 }
