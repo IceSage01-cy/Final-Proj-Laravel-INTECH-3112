@@ -52,7 +52,12 @@ export default function Login() {
                                     </div>
 
                                     <div className="mb-3">
-                                        <label className="form-label" htmlFor="password">Password</label>
+                                        <div className="d-flex justify-content-between align-items-center mb-1">
+                                            <label className="form-label mb-0" htmlFor="password">Password</label>
+                                            <Link href="/forgot-password" className="small text-decoration-none text-muted">
+                                                Forgot password?
+                                            </Link>
+                                        </div>
                                         <input
                                             id="password"
                                             type="password"
@@ -68,9 +73,14 @@ export default function Login() {
                                             Login
                                         </button>
                                     </div>
-                                    <div className="d-flex justify-content-between mt-3">
-                                        <Link href="/register">Create Employee account</Link>
-                                        <Link href="/forgot-password">Forgot password?</Link>
+
+                                    <div className="text-center mt-3 pt-2 border-top">
+                                        <p className="small text-muted mb-0">
+                                            Don't have an account?{' '}
+                                            <Link href="/register" className="text-decoration-none fw-semibold">
+                                                Create Employee account
+                                            </Link>
+                                        </p>
                                     </div>
                                 </form>
                             </div>
