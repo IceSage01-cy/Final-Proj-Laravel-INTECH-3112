@@ -32,10 +32,6 @@ export default function Index({ products }) {
             router.delete(`/products/${product.product_id}`, { preserveScroll: true });
         }
     }
-    const isAdmin = user?.role === 'admin';
-    const form = useForm({
-        productName: '', categoryName: '', supplierName: '', stockQty: 0, price: '', lowStockThreshold: 10,
-    });
 
     const counts = useMemo(() => {
         let low = 0;
@@ -61,26 +57,8 @@ export default function Index({ products }) {
                     {can('reports.view-own') && <Link href="/reports/monthly" className="btn btn-outline-light">My Monthly Report</Link>}
                     {can('categories.view') && <Link href="/categories" className="btn btn-outline-light">Categories</Link>}
                     {can('suppliers.view') && <Link href="/suppliers" className="btn btn-outline-light">Suppliers</Link>}
-                </>    
-                    isAdmin
-                    ? <Link href="/admin" className="btn btn-outline-light">Admin Dashboard</Link>
-                    : <Link href="/reports/monthly" className="btn btn-outline-light">My Monthly Report</Link>}
+                </>}
             >
-                {isAdmin && (
-                    <div className="card mb-4">
-                        <div className="card-body">
-                            <h5 className="section-title">Add Product</h5>
-                            <form className="row g-2" onSubmit={(e) => { e.preventDefault(); form.post('/products', { onSuccess: () => form.reset() }); }}>
-                                <div className="col-md-3"><input className="form-control" placeholder="Product name" value={form.data.productName} onChange={(e) => form.setData('productName', e.target.value)} required /></div>
-                                <div className="col-md-2"><input className="form-control" placeholder="Category" value={form.data.categoryName} onChange={(e) => form.setData('categoryName', e.target.value)} required /></div>
-                                <div className="col-md-2"><input className="form-control" placeholder="Supplier" value={form.data.supplierName} onChange={(e) => form.setData('supplierName', e.target.value)} required /></div>
-                                <div className="col-md-1"><input type="number" min="0" className="form-control" placeholder="Qty" value={form.data.stockQty} onChange={(e) => form.setData('stockQty', e.target.value)} required /></div>
-                                <div className="col-md-2"><input type="number" min="0.01" step="0.01" className="form-control" placeholder="Price" value={form.data.price} onChange={(e) => form.setData('price', e.target.value)} required /></div>
-                                <div className="col-md-2"><button className="btn btn-primary w-100" disabled={form.processing}>Add Product</button></div>
-                            </form>
-                        </div>
-                    </div>
-                )}
                 <div className="card">
                     <div className="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 className="mb-0">Inventory Records</h5>
