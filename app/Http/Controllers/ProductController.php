@@ -8,62 +8,88 @@ use App\Models\Supplier;
 use App\Support\InventoryQueries;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class ProductController extends Controller
+class ProductController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware('permission:products.view', only: ['index', 'show']),
+            new Middleware('permission:products.create', only: ['create', 'store']),
+            new Middleware('permission:products.update', only: ['edit', 'update']),
+            new Middleware('permission:products.delete', only: ['destroy']),
+        ];
+    }
+
     public function index(): Response
     {
-        return Inertia::render('inventory/index', [
+        return Inertia::render('products/index', [
             'products' => InventoryQueries::products(),
         ]);
     }
 
+    public function create(): Response
+    {
+        return Inertia::render('products/create', $this->formOptions());
+    }
+
     public function store(Request $request): RedirectResponse
     {
-        Product::create($this->attributes($this->validated($request)));
+        Product::create($this->validated($request));
 
-        return back()->with('success', 'Product added successfully.');
+        return to_route('products.index')->with('success', 'Product added successfully.');
+    }
+
+    public function show(Product $product): Response
+    {
+        return Inertia::render('products/show', [
+            'product' => $product->load(['category', 'supplier']),
+        ]);
+    }
+
+    public function edit(Product $product): Response
+    {
+        return Inertia::render('products/edit', [
+            'product' => $product,
+            ...$this->formOptions(),
+        ]);
     }
 
     public function update(Request $request, Product $product): RedirectResponse
     {
-        $product->update($this->attributes($this->validated($request)));
+        $product->update($this->validated($request));
 
-        return back()->with('success', 'Product updated successfully.');
+        return to_route('products.index')->with('success', 'Product updated successfully.');
     }
 
     public function destroy(Product $product): RedirectResponse
     {
         $product->delete();
 
-        return back()->with('success', 'Product deleted successfully.');
+        return to_route('products.index')->with('success', 'Product deleted successfully.');
     }
 
-   
+    private function formOptions(): array
+    {
+        return [
+            'categories' => Category::orderBy('category_name')->get(['category_id', 'category_name']),
+            'suppliers' => Supplier::orderBy('supplier_name')->get(['supplier_id', 'supplier_name']),
+        ];
+    }
+
     private function validated(Request $request): array
     {
         return $request->validate([
-            'productName'       => ['required', 'string', 'max:255'],
-            'categoryName'      => ['required', 'string', 'max:100'],
-            'supplierName'      => ['required', 'string', 'max:100'],
-            'stockQty'          => ['required', 'integer', 'min:0'],
-            'price'             => ['required', 'numeric', 'gt:0'],
-            'lowStockThreshold' => ['nullable', 'integer', 'min:0'],
+            'product_name'        => ['required', 'string', 'max:255'],
+            'category_id'         => ['required', 'integer', 'exists:categories,category_id'],
+            'supplier_id'         => ['required', 'integer', 'exists:suppliers,supplier_id'],
+            'stock_qty'           => ['required', 'integer', 'min:0'],
+            'price'               => ['required', 'numeric', 'gt:0', 'max:99999999.99'],
+            'low_stock_threshold' => ['required', 'integer', 'min:0'],
         ]);
-    }
-
-   
-    private function attributes(array $data): array
-    {
-        return [
-            'product_name'        => $data['productName'],
-            'category_id'         => Category::firstOrCreate(['category_name' => $data['categoryName']])->category_id,
-            'supplier_id'         => Supplier::firstOrCreate(['supplier_name' => $data['supplierName']])->supplier_id,
-            'stock_qty'           => $data['stockQty'],
-            'price'               => $data['price'],
-            'low_stock_threshold' => $data['lowStockThreshold'] ?? 10,
-        ];
     }
 }
