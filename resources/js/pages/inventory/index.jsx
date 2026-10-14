@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 import AppLayout from '../../inventory/AppLayout';
 import { peso } from '../../inventory/format';
@@ -22,6 +22,9 @@ export default function Index({ products }) {
     const { auth } = usePage().props;
     const user = auth?.user;
     const isAdmin = user?.role === 'admin';
+    const form = useForm({
+       productName: '', categoryName: '', supplierName: '', stockQty: 0, price: '', lowStockThreshold: 10,
+   });
 
     const counts = useMemo(() => {
         let low = 0;
@@ -41,8 +44,30 @@ export default function Index({ products }) {
             <AppLayout
                 title="Inventory Management System"
                 subtitle={user ? `Signed in as ${user.username} (${user.role})` : null}
-                actions={isAdmin && (<Link href="/admin" className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy">Admin Dashboard</Link>)}
-            >
+                actions={
+                    <Link
+                        href={isAdmin ? '/admin' : '/reports/monthly'}
+                        className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
+                    >
+                        {isAdmin ? 'Admin Dashboard' : 'My Monthly Report'}
+                    </Link>
+                }            
+            >   
+                {isAdmin && (
+                <div className="card mb-4">
+                    <div className="card-body">
+                        <h5 className="section-title">Add Product</h5>
+                        <form className="row g-2" onSubmit={(e) => { e.preventDefault(); form.post('/products', { onSuccess: () => form.reset() }); }}>
+                            <div className="col-md-3"><input className="form-control" placeholder="Product name" value={form.data.productName} onChange={(e) => form.setData('productName', e.target.value)} required /></div>
+                            <div className="col-md-2"><input className="form-control" placeholder="Category" value={form.data.categoryName} onChange={(e) => form.setData('categoryName', e.target.value)} required /></div>
+                            <div className="col-md-2"><input className="form-control" placeholder="Supplier" value={form.data.supplierName} onChange={(e) => form.setData('supplierName', e.target.value)} required /></div>
+                            <div className="col-md-1"><input type="number" min="0" className="form-control" placeholder="Qty" value={form.data.stockQty} onChange={(e) => form.setData('stockQty', e.target.value)} required /></div>
+                            <div className="col-md-2"><input type="number" min="0.01" step="0.01" className="form-control" placeholder="Price" value={form.data.price} onChange={(e) => form.setData('price', e.target.value)} required /></div>
+                            <div className="col-md-2"><button className="btn btn-primary w-100" disabled={form.processing}>Add Product</button></div>
+                        </form>
+                    </div>
+                </div>
+                )}
                 <div className="card">
                     <div className="card-header bg-white d-flex justify-content-between align-items-center">
                         <h5 className="mb-0">Inventory Records</h5>
