@@ -1,20 +1,29 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AppLayout from '../../inventory/AppLayout';
 import { peso } from '../../inventory/format';
+import { useCan } from '../../inventory/permissions';
 
 function EmptyRow({ colSpan, children = 'No records found.' }) {
     return <tr><td colSpan={colSpan} className="text-center text-muted py-3">{children}</td></tr>;
 }
 
 export default function Reports({ year, month, view, reports, pendingReports, inventorySummary, newProducts, restockNeeded }) {
+    const can = useCan();
     const period = `${year}-${String(month).padStart(2, '0')}`;
+    const remove = (report) => {
+        if (window.confirm(`Delete the report by ${report.employee?.username ?? 'this employee'}?`)) {
+            router.delete(`/admin/reports/${report.id}`, { preserveScroll: true });
+        }
+    };
     const changeView = (nextView) => router.get('/admin/reports', { period, view: nextView });
 
     return (
         <>
             <Head title="Monthly Reports" />
             <AppLayout title="Monthly Reports" subtitle="Review employee submissions"
-                actions={<Link href="/admin" className="btn btn-outline-light">Admin Dashboard</Link>}>
+                actions={can('dashboard.view')
+                    ? <Link href="/admin" className="btn btn-outline-light">Admin Dashboard</Link>
+                    : <Link href="/" className="btn btn-outline-light">Inventory</Link>}>
                 <div className="card">
                     <div className="card-body">
                         <div className="d-flex justify-content-between align-items-center mb-4">
@@ -103,7 +112,10 @@ export default function Reports({ year, month, view, reports, pendingReports, in
                                             <td className="text-wrap" style={{ minWidth: 220 }}>{report.accomplishments}</td>
                                             <td className="text-wrap">{report.notes || '—'}</td>
                                             <td><span className="badge bg-secondary">{report.status}</span></td>
-                                            <td>{report.status === 'submitted' && <button className="btn btn-sm btn-success" onClick={() => router.post(`/admin/reports/${report.id}/review`)}>Mark Reviewed</button>}</td>
+                                            <td className="text-nowrap">
+                                                {report.status === 'submitted' && can('reports.review') && <button className="btn btn-sm btn-success me-2" onClick={() => router.post(`/admin/reports/${report.id}/review`)}>Mark Reviewed</button>}
+                                                {can('reports.delete') && <button className="btn btn-sm btn-outline-danger" onClick={() => remove(report)}>Delete</button>}
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>

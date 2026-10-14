@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Login() {
@@ -70,15 +70,19 @@ export default function Login() {
                                 />
                             </div>
 
-                            <div className="d-grid">
-                                <button type="submit" className="btn btn-primary btn-lg" disabled={processing}>
-                                    {processing ? 'Signing in...' : 'Login'}
-                                </button>
-                            </div>
+                                    <div className="d-grid">
+                                        <button type="submit" className="btn btn-primary" disabled={processing}>
+                                            Login
+                                        </button>
+                                    </div>
+                                        <div className="d-flex justify-content-between mt-3">
+                                        <Link href="/register">Create Employee account</Link>
+                                        <Link href="/forgot-password">Forgot password?</Link>
+                                    </div>
                         </form>
                     </div>
                 </div>
             </div>
         </>
-    );
+   );
 }

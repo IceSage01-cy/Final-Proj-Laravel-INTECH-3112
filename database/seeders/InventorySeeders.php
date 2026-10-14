@@ -4,13 +4,14 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Imports the data from the old PHP project's database.sql.
  * IDs are kept exactly as they were so products still point to the right
  * category and supplier. Run order matters (categories/suppliers before products).
  */
-class InventoryDataSeeders extends Seeder
+class InventorySeeders extends Seeder
 {
     public function run(): void
     {
@@ -52,13 +53,11 @@ class InventoryDataSeeders extends Seeder
             ['product_id' => 16, 'product_name' => 'Office table', 'category_id' => 3, 'supplier_id' => 7, 'stock_qty' => 100, 'price' => 3000.00, 'low_stock_threshold' => 10, 'created_at' => '2026-08-17 00:38:46', 'updated_at' => '2026-08-17 00:38:46'],
         ]);
 
-        // Password hashes are copied as-is, so the old passwords still work.
-        // The admin hash used the "$2b$" prefix; it is rewritten to "$2y$"
-        // (same bcrypt algorithm) because Laravel only accepts "$2y$".
+        // Demo accounts. Hash::make() stores them as bcrypt hashes.
         DB::table('users')->insert([
-            ['user_id' => 1, 'username' => 'admin', 'password' => '$2y$10$yUdaWWcASOkM4DpEQ.W9g.aMkjTQGvG6jiI.gCmSiblfT.KjfQFcm', 'role' => 'admin', 'created_at' => '2026-08-17 00:08:26', 'updated_at' => '2026-08-17 00:08:26'],
-            ['user_id' => 2, 'username' => 'user', 'password' => '$2y$10$WjFyt5ZvUPHdHrrH8OK5NujozSDd98TmzLdXg.NJza8LnJgpHeVgO', 'role' => 'employee', 'created_at' => '2026-08-17 00:16:25', 'updated_at' => '2026-08-17 00:16:25'],
-            ['user_id' => 3, 'username' => 'New', 'password' => '$2y$10$ylrFzUgRdRLGetzl9Il0O.adVCa5CVijmtz5iY6N.TT0fUKD0EkTe', 'role' => 'employee', 'created_at' => '2026-08-17 00:39:32', 'updated_at' => '2026-08-17 00:39:32'],
+            ['user_id' => 1, 'username' => 'Admin', 'password' => Hash::make('admin123'), 'created_at' => '2026-08-17 00:08:26', 'updated_at' => '2026-08-17 00:08:26'],
+            ['user_id' => 2, 'username' => 'Manager', 'password' => Hash::make('12345'), 'created_at' => '2026-08-17 00:16:25', 'updated_at' => '2026-08-17 00:16:25'],
+            ['user_id' => 3, 'username' => 'Employee', 'password' => Hash::make('456123'), 'created_at' => '2026-08-17 00:39:32', 'updated_at' => '2026-08-17 00:39:32'],
         ]);
     }
 }

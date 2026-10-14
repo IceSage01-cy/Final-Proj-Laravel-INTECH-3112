@@ -18,6 +18,7 @@ function Empty({ children }) {
     return <p className="px-5 py-8 text-center text-sm text-slate-500">{children}</p>;
 }
 
+import { useCan } from '../../inventory/permissions';
 function StatItem({ label, value, tone }) {
     const valueColor =
         tone === 'warn' ? 'text-amber-600' : tone === 'danger' ? 'text-red-600' : 'text-navy';
@@ -38,6 +39,7 @@ export default function Dashboard({
     supplierStats,
     restockNeeded,
 }) {
+    const can = useCan();
     const maxCategoryValue = Math.max(1, ...categoryBreakdown.map((c) => Number(c.totalValue) || 0));
     const outCount = Number(summary.outOfStockCount) || 0;
     const lowCount = Number(summary.lowStockCount) || 0;
@@ -48,28 +50,18 @@ export default function Dashboard({
             <AppLayout
                 title="Admin Dashboard"
                 subtitle="Monitoring overview for the whole system"
-                 actions={
-                        <>
-                            <Link
-                                href="/admin/reports"
-                                className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
-                            >
-                                Monthly Reports{pendingReports > 0 && ` (${pendingReports})`}
-                            </Link>
-                            <Link
-                                href="/admin/employees"
-                                className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
-                            >
-                                Manage Employees
-                            </Link>
-                            <Link
-                                href="/"
-                                className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
-                            >
-                                Back to Inventory
-                            </Link>
-                        </>
-                    }
+                actions={<>
+                    {can('reports.view-all') && <>
+                        <Link href="/admin/reports?view=employees" className="btn btn-outline-light position-relative">
+                            Employee Reports
+                            {pendingReports > 0 && <span className="unread-dot" title={`${pendingReports} report${pendingReports === 1 ? '' : 's'} awaiting review`} aria-label={`${pendingReports} unread employee reports`} />}
+                        </Link>
+                        <Link href="/admin/reports?view=products" className="btn btn-outline-light">Product Reports</Link>
+                    </>}
+                    {can('employees.view') && <Link href="/admin/employees" className="btn btn-outline-light">Manage Employees</Link>}
+                    {can('managers.view') &&<Link href="/admin/managers" className="btn btn-outline-light">Manage Product Managers</Link>}
+                    {can('products.view') && <Link href="/" className="btn btn-outline-light">Products</Link>}
+                </>}
             >
                 <div className="space-y-6">
                 <div className="grid grid-cols-2 divide-slate-200 overflow-hidden rounded-md border border-slate-200 bg-white sm:grid-cols-3 lg:grid-cols-6 lg:divide-x">
