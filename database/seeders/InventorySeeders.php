@@ -55,7 +55,7 @@ class InventorySeeders extends Seeder
 
         // Demo accounts. Hash::make() stores them as bcrypt hashes.
         DB::table('users')->insert([
-            ['user_id' => 1, 'username' => 'SuperAdmin', 'password' => Hash::make('admin123'), 'created_at' => '2026-08-17 00:08:26', 'updated_at' => '2026-08-17 00:08:26'],
+            ['user_id' => 1, 'username' => 'Admin', 'password' => Hash::make('admin123'), 'created_at' => '2026-08-17 00:08:26', 'updated_at' => '2026-08-17 00:08:26'],
             ['user_id' => 2, 'username' => 'Manager', 'password' => Hash::make('12345'), 'created_at' => '2026-08-17 00:16:25', 'updated_at' => '2026-08-17 00:16:25'],
             ['user_id' => 3, 'username' => 'Employee', 'password' => Hash::make('456123'), 'created_at' => '2026-08-17 00:39:32', 'updated_at' => '2026-08-17 00:39:32'],
         ]);

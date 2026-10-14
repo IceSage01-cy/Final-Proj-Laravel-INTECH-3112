@@ -8,11 +8,11 @@ use Spatie\Permission\PermissionRegistrar;
 
 /**
  * Replaces the users.role enum with Spatie roles. Existing users keep their
- * access: admin -> super-admin, employee -> employee.
+ * access: admin -> admin, employee -> employee.
  */
 return new class extends Migration
 {
-    private const MAP = ['admin' => 'super-admin', 'employee' => 'employee'];
+    private const MAP = ['admin' => 'admin', 'employee' => 'employee'];
 
     public function up(): void
     {
@@ -51,7 +51,7 @@ return new class extends Migration
             $table->enum('role', ['admin', 'employee'])->default('employee')->after('password');
         });
 
-        $adminRoleId = DB::table($tables['roles'])->where('name', 'super-admin')->value('id');
+        $adminRoleId = DB::table($tables['roles'])->where('name', 'admin')->value('id');
 
         if ($adminRoleId) {
             $adminIds = DB::table($tables['model_has_roles'])

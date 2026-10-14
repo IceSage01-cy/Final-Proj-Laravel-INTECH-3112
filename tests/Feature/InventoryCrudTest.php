@@ -118,7 +118,7 @@ class InventoryCrudTest extends TestCase
     {
         $employee = $this->userWithRole('employee');
         $manager = $this->userWithRole('product-manager');
-        $admin = $this->userWithRole('super-admin');
+        $admin = $this->userWithRole('admin');
 
         $this->actingAs($employee)->get('/reports/monthly')->assertOk();
         $this->actingAs($employee)->get('/admin/reports')->assertForbidden();
@@ -130,7 +130,7 @@ class InventoryCrudTest extends TestCase
 
     public function test_dashboard_and_reports_are_built_from_eloquent_relationships(): void
     {
-        $admin = $this->userWithRole('super-admin');
+        $admin = $this->userWithRole('admin');
         $manager = $this->userWithRole('product-manager');
         $product = $this->product();                                  // 20 in stock @ 450, threshold 5
         $product->replicate()->fill(['product_name' => 'Low', 'stock_qty' => 2, 'price' => 100])->save();
@@ -150,13 +150,13 @@ class InventoryCrudTest extends TestCase
         $this->actingAs($manager)->get('/admin/reports?view=products')->assertOk()
             ->assertInertia(fn ($page) => $page->component('admin/reports')->has('newProducts', 3));
 
-        // product managers are not super admins
+        // product managers are not admins
         $this->actingAs($manager)->get('/admin')->assertForbidden();
     }
 
     public function test_manager_accounts_follow_the_same_password_rules_as_registration(): void
     {
-        $admin = $this->userWithRole('super-admin');
+        $admin = $this->userWithRole('admin');
 
         $this->actingAs($admin)->post('/admin/managers', ['username' => 'weak', 'password' => '12345'])
             ->assertSessionHasErrors('password');
@@ -169,7 +169,7 @@ class InventoryCrudTest extends TestCase
     public function test_only_product_managers_manage_categories(): void
     {
         $employee = $this->userWithRole('employee');
-        $admin = $this->userWithRole('super-admin');
+        $admin = $this->userWithRole('admin');
 
         $this->actingAs($employee)->get('/categories')->assertForbidden();
         $this->actingAs($admin)->get('/categories')->assertOk();

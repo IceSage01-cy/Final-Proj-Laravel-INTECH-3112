@@ -10,7 +10,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Super admin: view / delete employee accounts. Employees create their own
+ * Admin: view / delete employee accounts. Employees create their own
  * accounts on the register page, so there is no create action here.
  */
 class EmployeeController extends Controller implements HasMiddleware

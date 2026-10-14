@@ -14,7 +14,7 @@ use Spatie\Permission\PermissionRegistrar;
  */
 class RolesAndPermissionsSeeder extends Seeder
 {
-    public const SUPER_ADMIN = 'super-admin';
+    public const ADMIN = 'admin';
     public const PRODUCT_MANAGER = 'product-manager';
     public const EMPLOYEE = 'employee';
 
@@ -23,7 +23,7 @@ class RolesAndPermissionsSeeder extends Seeder
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $matrix = [
-            self::SUPER_ADMIN => [
+            self::ADMIN => [
                 'dashboard.view',
                 'managers.view',
                 'managers.create',
@@ -67,11 +67,18 @@ class RolesAndPermissionsSeeder extends Seeder
         // refresh never fires. Flush by hand or the new permissions look missing.
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
+        // The role used to be called "super-admin"; rename it in place so the
+        // users already holding it keep their access.
+        $legacy = Role::where('name', 'super-admin')->where('guard_name', 'web')->first();
+        if ($legacy && ! Role::where('name', self::ADMIN)->where('guard_name', 'web')->exists()) {
+            $legacy->update(['name' => self::ADMIN]);
+        }
+
         foreach ($matrix as $role => $permissions) {
             Role::findOrCreate($role, 'web')->syncPermissions($permissions);
         }
 
-        // Employees register themselves, so the super admin no longer creates them.
+        // Employees register themselves, so the admin no longer creates them.
         Permission::where('name', 'employees.create')->delete();
 
         $this->seedAccounts();
@@ -86,7 +93,7 @@ class RolesAndPermissionsSeeder extends Seeder
     private function seedAccounts(): void
     {
         $demoAccounts = [
-            'SuperAdmin' => self::SUPER_ADMIN,
+            'SuperAdmin' => self::ADMIN,
             'Manager' => self::PRODUCT_MANAGER,
             'Employee' => self::EMPLOYEE,
         ];

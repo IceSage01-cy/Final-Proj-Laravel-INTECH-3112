@@ -12,7 +12,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Super admin: create / view / delete product manager accounts. Managers are
+ * Admin: create / view / delete product manager accounts. Managers are
  * never created through the public register page (that is employees only).
  */
 class ManagerController extends Controller implements HasMiddleware
