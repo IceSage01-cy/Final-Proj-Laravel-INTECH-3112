@@ -22,43 +22,35 @@ export default function Login() {
 
     const error = clientError || errors.username || errors.password;
 
-        return (
+    return (
         <>
             <Head title="Login" />
-            <div className="flex min-h-screen bg-paper">
-                <div className="hidden w-1/2 flex-col justify-between bg-navy p-12 text-white lg:flex">
-                    <div className="text-xl font-semibold">Inventory System</div>
+            <div className="login-split">
+                <div className="login-aside">
+                    <div className="fs-5 fw-semibold">Inventory System</div>
                     <div>
-                        <h1 className="text-4xl font-bold leading-tight">
-                            Track stock.<br />Stay ahead of shortages.
-                        </h1>
-                        <p className="mt-4 max-w-md text-white/80">
+                        <h1>Track stock.<br />Stay ahead of shortages.</h1>
+                        <p className="mt-4 mb-0 opacity-75">
                             Manage products, suppliers, and low-stock alerts in one place.
                         </p>
                     </div>
-                    <p className="text-sm text-white/60">INTECH 3112 Final Project</p>
+                    <small className="opacity-75">INTECH 3112 Final Project</small>
                 </div>
 
-                <div className="flex w-full items-center justify-center px-6 py-12 lg:w-1/2">
-                    <div className="w-full max-w-sm">
-                        <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
-                        <p className="mt-1 text-sm text-slate-500">Sign in to continue</p>
+                <div className="login-main">
+                    <div className="login-form-wrap">
+                        <h2 className="fw-bold mb-1">Welcome back</h2>
+                        <p className="text-secondary mb-4">Sign in to continue</p>
 
-                        <form className="mt-8 space-y-5" onSubmit={submit}>
-                            {error && (
-                                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                                    {error}
-                                </div>
-                            )}
+                        <form onSubmit={submit}>
+                            {error && <div className="alert alert-danger">{error}</div>}
 
-                            <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="username">
-                                    Username
-                                </label>
+                            <div className="mb-3">
+                                <label className="form-label" htmlFor="username">Username</label>
                                 <input
                                     id="username"
                                     type="text"
-                                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-navy focus:ring-2 focus:ring-navy/20"
+                                    className="form-control"
                                     placeholder="Enter username"
                                     autoFocus
                                     value={data.username}
@@ -66,27 +58,23 @@ export default function Login() {
                                 />
                             </div>
 
-                            <div>
-                                <label className="mb-1 block text-sm font-medium text-slate-700" htmlFor="password">
-                                    Password
-                                </label>
+                            <div className="mb-4">
+                                <label className="form-label" htmlFor="password">Password</label>
                                 <input
                                     id="password"
                                     type="password"
-                                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 outline-none focus:border-navy focus:ring-2 focus:ring-navy/20"
+                                    className="form-control"
                                     placeholder="Enter password"
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                 />
                             </div>
 
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="w-full rounded-lg bg-navy px-4 py-2.5 font-medium text-white transition hover:bg-navy-dark disabled:opacity-60"
-                            >
-                                {processing ? 'Signing in...' : 'Login'}
-                            </button>
+                            <div className="d-grid">
+                                <button type="submit" className="btn btn-primary btn-lg" disabled={processing}>
+                                    {processing ? 'Signing in...' : 'Login'}
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

@@ -30,6 +30,7 @@ function StatItem({ label, value, tone }) {
 }
 
 export default function Dashboard({
+    pendingReports,
     summary,
     totalCategories,
     totalSuppliers,
@@ -47,14 +48,28 @@ export default function Dashboard({
             <AppLayout
                 title="Admin Dashboard"
                 subtitle="Monitoring overview for the whole system"
-                actions={
-                        <Link
-                            href="/"
-                            className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
-                        >
-                            Back to Inventory
-                        </Link>
-                        }
+                 actions={
+                        <>
+                            <Link
+                                href="/admin/reports"
+                                className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
+                            >
+                                Monthly Reports{pendingReports > 0 && ` (${pendingReports})`}
+                            </Link>
+                            <Link
+                                href="/admin/employees"
+                                className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
+                            >
+                                Manage Employees
+                            </Link>
+                            <Link
+                                href="/"
+                                className="rounded border border-white/40 px-4 py-2 text-sm font-medium text-white transition hover:bg-white hover:text-navy"
+                            >
+                                Back to Inventory
+                            </Link>
+                        </>
+                    }
             >
                 <div className="space-y-6">
                 <div className="grid grid-cols-2 divide-slate-200 overflow-hidden rounded-md border border-slate-200 bg-white sm:grid-cols-3 lg:grid-cols-6 lg:divide-x">

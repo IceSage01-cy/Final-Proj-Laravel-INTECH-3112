@@ -6,6 +6,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -48,5 +49,9 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+        public function monthlyReports(): HasMany
+    {
+        return $this->hasMany(MonthlyReport::class, 'user_id', 'user_id');
     }
 }

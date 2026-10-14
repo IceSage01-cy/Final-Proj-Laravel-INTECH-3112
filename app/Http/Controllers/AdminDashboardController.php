@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MonthlyReport;
 use App\Models\Category;
 use App\Models\Supplier;
 use App\Support\InventoryQueries;
@@ -19,6 +20,7 @@ class AdminDashboardController extends Controller
             'categoryBreakdown' => InventoryQueries::categoryBreakdown(),
             'supplierStats'     => InventoryQueries::supplierStats(),
             'restockNeeded'     => InventoryQueries::restockNeeded(),
+            'pendingReports'    => MonthlyReport::where('status', 'submitted')->count(),
         ]);
     }
 }

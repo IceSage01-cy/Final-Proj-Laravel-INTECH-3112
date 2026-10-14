@@ -2,30 +2,123 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MonthlyReport;
 use App\Support\InventoryQueries;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ReportController extends Controller
 {
-    public function monthly(Request $request): Response
+    public function index(Request $request): Response
     {
-        $parts = explode('-', (string) $request->query('month', now()->format('Y-m')));
+        [$year, $month] = $this->period($request);
+        $report = MonthlyReport::where('user_id', $request->user()->user_id)
+            ->where('report_year', $year)
+            ->where('report_month', $month)
+            ->first();
 
-        $year  = (int) ($parts[0] ?? 0) ?: now()->year;
-        $month = (int) ($parts[1] ?? 0);
+        return Inertia::render('reports/monthly', compact('year', 'month', 'report'));
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $data = $this->validated($request);
+        [$year, $month] = $this->period($request);
+        $existing = MonthlyReport::where('user_id', $request->user()->user_id)
+            ->where('report_year', $year)
+            ->where('report_month', $month)
+            ->first();
+
+        if ($existing?->status === 'submitted' || $existing?->status === 'reviewed') {
+            return back()->with('error', 'Submitted and reviewed reports cannot be edited.');
+        }
+
+        MonthlyReport::updateOrCreate(
+            ['user_id' => $request->user()->user_id, 'report_year' => $year, 'report_month' => $month],
+            [...$data, 'status' => 'draft', 'reviewed_at' => null],
+        );
+
+        return back()->with('success', 'Monthly report saved as a draft.');
+    }
+
+    public function submit(Request $request, MonthlyReport $report): RedirectResponse
+    {
+        $this->ensureOwner($request, $report);
+
+        if ($report->status === 'reviewed') {
+            return back()->with('error', 'A reviewed report cannot be submitted again.');
+        }
+
+        $report->update(['status' => 'submitted']);
+
+        return back()->with('success', 'Monthly report submitted for review.');
+    }
+
+    public function adminIndex(Request $request): Response
+    {
+        $period = (string) $request->query('period', now()->format('Y-m'));
+        $view = (string) $request->query('view', 'employees');
+        [$year, $month] = array_pad(explode('-', $period), 2, null);
+        $year = (int) $year ?: now()->year;
+        $month = (int) $month;
+        $view = in_array($view, ['employees', 'products'], true) ? $view : 'employees';
 
         if ($month < 1 || $month > 12) {
             $month = now()->month;
         }
 
-        return Inertia::render('reports/monthly', [
-            'month'         => $month,
-            'year'          => $year,
-            'summary'       => InventoryQueries::summary(),
-            'newProducts'   => InventoryQueries::newProducts($month, $year),
+        $reports = MonthlyReport::with('employee:user_id,username')
+            ->where('report_year', $year)
+            ->where('report_month', $month)
+            ->latest('updated_at')
+            ->get();
+
+        return Inertia::render('admin/reports', [
+            'year' => $year,
+            'month' => $month,
+            'view' => $view,
+            'reports' => $reports,
+            'pendingReports' => MonthlyReport::where('status', 'submitted')->count(),
+            'inventorySummary' => InventoryQueries::summary(),
+            'newProducts' => InventoryQueries::newProducts($month, $year),
             'restockNeeded' => InventoryQueries::restockNeeded(),
         ]);
+    }
+
+    public function review(MonthlyReport $report): RedirectResponse
+    {
+        if ($report->status !== 'submitted') {
+            return back()->with('error', 'Only submitted reports can be marked as reviewed.');
+        }
+
+        $report->update(['status' => 'reviewed', 'reviewed_at' => now()]);
+
+        return back()->with('success', 'Report marked as reviewed.');
+    }
+
+    private function validated(Request $request): array
+    {
+        return $request->validate([
+            'accomplishments' => ['required', 'string', 'max:10000'],
+            'hours_worked' => ['required', 'numeric', 'min:0', 'max:744'],
+            'notes' => ['nullable', 'string', 'max:10000'],
+        ]);
+    }
+
+    private function period(Request $request): array
+    {
+        $value = (string) $request->input('period', now()->format('Y-m'));
+        [$year, $month] = array_pad(explode('-', $value), 2, null);
+        $year = (int) $year ?: now()->year;
+        $month = (int) $month;
+
+        return [$year, $month >= 1 && $month <= 12 ? $month : now()->month];
+    }
+
+    private function ensureOwner(Request $request, MonthlyReport $report): void
+    {
+        abort_unless($report->user_id === $request->user()->user_id, 403);
     }
 }
