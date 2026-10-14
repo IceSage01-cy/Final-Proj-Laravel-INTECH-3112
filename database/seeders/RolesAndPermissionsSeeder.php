@@ -63,23 +63,23 @@ class RolesAndPermissionsSeeder extends Seeder
     }
 
     /**
-     * Give the seeded accounts a role. Anyone without a role becomes an employee.
+     * Give the demo accounts from InventorySeeders their roles. Any other user
+     * without a role (e.g. an older account) becomes an employee.
      */
     private function seedAccounts(): void
     {
-        // Demo product manager (only created if missing; change this password).
-        User::firstOrCreate(
-            ['username' => 'manager'],
-            ['email' => 'manager@example.com', 'password' => 'manager123'],
-        );
-
-        $named = [
-            'admin' => self::SUPER_ADMIN,
-            'manager' => self::PRODUCT_MANAGER,
+        $demoAccounts = [
+            'SuperAdmin' => self::SUPER_ADMIN,
+            'Manager' => self::PRODUCT_MANAGER,
+            'Employee' => self::EMPLOYEE,
         ];
 
+        foreach ($demoAccounts as $username => $role) {
+            User::where('username', $username)->first()?->syncRoles($role);
+        }
+
         User::doesntHave('roles')->get()->each(
-            fn (User $user) => $user->assignRole($named[$user->username] ?? self::EMPLOYEE)
+            fn (User $user) => $user->assignRole(self::EMPLOYEE)
         );
     }
 }
