@@ -29,7 +29,7 @@ This application manages product inventories, categories, suppliers, and user ro
 
 Ensure the following tools are installed on the computer before setup:
 
-1. **PHP >= 8.2** (with extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `curl`)
+1. **PHP >= 8.3** (with extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `curl`)
 2. **Composer** (v2.x) - [getcomposer.org](https://getcomposer.org/)
 3. **Node.js** (v18.x or v20.x+) and **npm** - [nodejs.org](https://nodejs.org/)
 4. **MySQL** or **Laragon / XAMPP**
