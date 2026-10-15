@@ -175,7 +175,7 @@ The database comes pre-seeded with 3 test accounts corresponding to each role in
 
 | Role | Username | Password | Access & Capabilities |
 | :--- | :--- | :--- | :--- |
-| **Super Admin** | `SuperAdmin` | `admin123` | Analytics dashboard, manage manager accounts, manage employee accounts, product overview |
+| **Admin** | `Admin` | `admin123` | Analytics dashboard, manage manager accounts, manage employee accounts, product overview |
 | **Product Manager** | `Manager` | `12345` | Product CRUD, Category CRUD, Supplier CRUD, review/approve monthly reports |
 | **Employee** | `Employee` | `456123` | View product catalog, draft and submit personal monthly accomplishment reports |
 
