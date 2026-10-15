@@ -16,7 +16,7 @@ This application manages product inventories, categories, suppliers, and user ro
 
 ## 🛠️ Tech Stack
 
-- **Backend Framework**: [Laravel 12](https://laravel.com/) (PHP ^8.2)
+- **Backend Framework**: [Laravel 12](https://laravel.com/) (PHP ^8.3)
 - **Frontend SPA Bridge**: [Inertia.js 2.x](https://inertiajs.com/)
 - **Frontend Framework**: [React 19](https://react.dev/)
 - **CSS / Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
