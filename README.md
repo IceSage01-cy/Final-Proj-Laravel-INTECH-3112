@@ -1,37 +1,52 @@
 # Inventory Management System (INTECH 3112 Final Project)
 
-An **Inventory Management System** developed with **Laravel 12**, **Inertia.js**, **React**, and **Tailwind CSS**, backed by **MySQL**. This project modernizes a traditional inventory web application into a full-stack Single Page Application (SPA).
+A production-grade **Inventory Management System** developed with **Laravel 12**, **Inertia.js**, **React 19**, **Bootstrap 5**, and **Tailwind CSS**, backed by **MySQL**. 
+
+This application was developed as the capstone assessment for **INTECH 3112**, synthesizing:
+- **Activity 3**: Laravel MVC Backend Architecture & Normalized Migrations
+- **Activity 4**: Modern Frontend Integration (React, Inertia.js, Vite)
+- **Activity 5**: Headless Authentication (Laravel Fortify) & Role-Based Access Control (Spatie Permission)
 
 ---
 
-## 📌 Project Overview
+## 📌 Features & Capabilities
 
-This application manages product inventories, categories, suppliers, and user roles (Admin & Employee). It incorporates:
-- **Role-Based Access Control**: Separate workflows for `admin` and `employee` users.
-- **Product Management**: Tracking product quantities, unit prices, and custom low-stock thresholds.
-- **Category & Supplier Linking**: Relational database structure connecting products to categories and suppliers.
-- **Modern Full-Stack Stack**: Backend routing, migrations, and Eloquent ORM powered by Laravel; reactive UI powered by Inertia.js and React.
+- **Multi-Role Authentication (Laravel Fortify + Spatie RBAC)**:
+  - **Super Admin**: Full administrative control, system metrics dashboard, manager accounts management, employee account moderation.
+  - **Product Manager**: Complete CRUD operations on products, categories, suppliers, and review/approval of monthly employee reports.
+  - **Employee**: Product catalog viewer, and personal monthly accomplishment report submission/tracking.
+- **Inventory & Stock Management**:
+  - Normalized database schema with `cascadeOnDelete()` relational integrity.
+  - Automatic low-stock warnings, out-of-stock badges, and suggested reorder quantity calculations.
+- **Monthly Accomplishment Reports**:
+  - Employee workflow for drafting, submitting, and tracking hours worked and monthly accomplishments.
+  - Manager review and approval interface.
+- **Single Page Application (SPA) Experience**:
+  - Fast, client-side page transitions via **Inertia.js** without full page reloads.
+  - Real-time form validation feedback, flash notifications, and role-conditional UI rendering (`useCan()` hook).
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Technology Stack
 
-- **Backend Framework**: [Laravel 12](https://laravel.com/) (PHP ^8.3)
+- **Backend**: [Laravel 12](https://laravel.com/) (PHP ^8.3)
+- **Authentication**: [Laravel Fortify](https://laravel.com/docs/fortify) (Headless auth)
+- **Authorization & RBAC**: [Spatie Laravel-Permission](https://spatie.be/docs/laravel-permission/)
 - **Frontend SPA Bridge**: [Inertia.js 2.x](https://inertiajs.com/)
 - **Frontend Framework**: [React 19](https://react.dev/)
-- **CSS / Styling**: [Tailwind CSS v4](https://tailwindcss.com/)/[Bootstrap](https://getbootstrap.com)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Database**: MySQL / MariaDB (via Laragon, XAMPP, or native install)
+- **Styling**: [Bootstrap 5](https://getbootstrap.com/) & [Tailwind CSS v4](https://tailwindcss.com/)
+- **Build Tool**: [Vite 7](https://vitejs.dev/)
+- **Database**: MySQL 8.x / MariaDB (via Laragon, XAMPP, or native install)
 
 ---
 
 ## 📋 Prerequisites
 
-Ensure the following tools are installed on the computer before setup:
+Ensure the following tools are installed on your computer before starting:
 
 1. **PHP >= 8.3** (with extensions: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `curl`)
-2. **Composer** (v2.x) - [getcomposer.org](https://getcomposer.org/)
-3. **Node.js** (v18.x or v20.x+) and **npm** - [nodejs.org](https://nodejs.org/)
+2. **Composer (v2.x)** - [getcomposer.org](https://getcomposer.org/)
+3. **Node.js (v18.x or v20.x+) and npm** - [nodejs.org](https://nodejs.org/)
 4. **MySQL** or **Laragon / XAMPP**
 5. **Git** - [git-scm.com](https://git-scm.com/)
 
@@ -39,7 +54,7 @@ Ensure the following tools are installed on the computer before setup:
 
 ## 🚀 Setup & Installation Guide
 
-Follow these steps to set up and run the repository on any computer:
+Follow these steps to set up the repository from scratch:
 
 ### 1. Clone the Repository
 
@@ -50,28 +65,28 @@ cd Final-Proj-Laravel-INTECH-3112
 
 ### 2. Switch to the Working Branch
 
-Check out the branch containing the latest migrations, models, and React integration:
+Check out the branch containing the full Spatie RBAC and Fortify implementation:
 
 ```bash
-git checkout migrations-models
+git checkout spatie-role
 ```
 
 ---
 
 ### 3. Configure the Environment (`.env`)
 
-Duplicate the sample environment file to create your local `.env`:
+Copy the sample environment file to `.env`:
 
-**On Windows (PowerShell):**
+**Windows (PowerShell):**
 ```powershell
 Copy-Item .env.example .env
 ```
-**On macOS / Linux / Git Bash:**
+**macOS / Linux / Git Bash:**
 ```bash
 cp .env.example .env
 ```
 
-Open `.env` and verify your database configuration (matches default Laragon settings):
+Open `.env` and verify your database connection (default Laragon MySQL settings):
 
 ```env
 DB_CONNECTION=mysql
@@ -81,15 +96,15 @@ DB_DATABASE=final-proj
 DB_USERNAME=root
 DB_PASSWORD=
 ```
-*(If using XAMPP or custom MySQL credentials, update `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` accordingly).*
+*(If using XAMPP or custom credentials, change `DB_DATABASE`, `DB_USERNAME`, or `DB_PASSWORD` accordingly).*
 
 ---
 
 ### 4. Create the Database
 
-Make sure your MySQL service is running (e.g. click **Start All** in Laragon/XAMPP).
+Ensure MySQL is running (e.g. click **Start All** in Laragon).
 
-Create a database named **`final-proj`** using your preferred database client (HeidiSQL, phpMyAdmin, or MySQL CLI):
+Create a new database named **`final-proj`** using your MySQL client (HeidiSQL, phpMyAdmin, or MySQL CLI):
 
 ```sql
 CREATE DATABASE `final-proj`;
@@ -99,12 +114,12 @@ CREATE DATABASE `final-proj`;
 
 ### 5. Install Dependencies
 
-Install PHP backend packages:
+Install PHP backend dependencies:
 ```bash
 composer install
 ```
 
-Install frontend JavaScript packages:
+Install frontend Node dependencies:
 ```bash
 npm install
 ```
@@ -112,8 +127,6 @@ npm install
 ---
 
 ### 6. Generate Application Encryption Key
-
-Generate your unique Laravel application key:
 
 ```bash
 php artisan key:generate
@@ -123,54 +136,48 @@ php artisan key:generate
 
 ### 7. Run Database Migrations & Seeders
 
-Migrate the database tables and populate initial inventory data:
+Run the migrations to create all application, auth, and permission tables, and populate the database with default demo data:
 
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-This sets up:
-- `users` (Admin and Employee accounts)
-- `categories` (Electronics, Office Supplies, Furniture, etc.)
-- `suppliers` (TechSupply Inc., OfficePlus, etc.)
-- `products` (Stock quantities, unit prices, low stock alerts)
+This automatically runs:
+- `InventorySeeders`: Populates initial categories, suppliers, products, and default user accounts.
+- `RolesAndPermissionsSeeder`: Sets up Spatie roles (`super-admin`, `product-manager`, `employee`) and assigns granular permissions.
 
 ---
 
 ### 8. Run the Development Server
 
-Start both the Laravel backend and the Vite asset server:
+Start the application servers:
 
-#### Option A: Single Command
 ```bash
 composer run dev
 ```
 
-#### Option B: Separate Terminals
-- **Terminal 1 (Backend):**
-  ```bash
-  php artisan serve
-  ```
-- **Terminal 2 (Frontend / Vite):**
-  ```bash
-  npm run dev
-  ```
+*(This command starts both the Laravel backend server at `http://127.0.0.1:8000` and the Vite asset server at `http://localhost:5173` concurrently).*
 
 ---
 
 ### 9. Access the Application
 
-- **Main Welcome Page**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **Inertia / React Test Page**: [http://127.0.0.1:8000/hello](http://127.0.0.1:8000/hello)
+Open your browser and navigate to:
+👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+
+*(The root URL will automatically direct you to the Login page at `/login`).*
 
 ---
 
-## 🔑 Seeded Demo Credentials
+## 🔑 Demo Login Accounts
 
-| Role | Username | Notes |
-| :--- | :--- | :--- |
-| **Admin** | `admin` | Full administrative access |
-| **Employee** | `user` | Standard staff access |
+The database comes pre-seeded with 3 test accounts corresponding to each role in the RBAC hierarchy:
+
+| Role | Username | Password | Access & Capabilities |
+| :--- | :--- | :--- | :--- |
+| **Super Admin** | `SuperAdmin` | `admin123` | Analytics dashboard, manage manager accounts, manage employee accounts, product overview |
+| **Product Manager** | `Manager` | `12345` | Product CRUD, Category CRUD, Supplier CRUD, review/approve monthly reports |
+| **Employee** | `Employee` | `456123` | View product catalog, draft and submit personal monthly accomplishment reports |
 
 ---
 
@@ -178,22 +185,36 @@ composer run dev
 
 ```text
 ├── app/
+│   ├── Actions/Fortify/         # Fortify headless auth actions (registration, password reset)
 │   ├── Http/
-│   │   ├── Controllers/         # Admin, Employee, Product, Report controllers
-│   │   └── Middleware/          # Inertia requests & role-based middleware
-│   └── Models/                  # Eloquent models (User, Product, Category, Supplier)
+│   │   ├── Controllers/         # RESTful resource controllers (Products, Categories, Suppliers, Reports, Admin)
+│   │   └── Middleware/          # HandleInertiaRequests (shares auth & permissions with React)
+│   ├── Models/                  # Eloquent models (User, Product, Category, Supplier, MonthlyReport)
+│   └── Support/                 # InventoryQueries domain query logic
 ├── database/
-│   ├── migrations/              # Database schema migrations
-│   └── seeders/                 # Inventory & user seeders
+│   ├── migrations/              # Normalized relational tables & permission schemas
+│   └── seeders/                 # InventorySeeders & RolesAndPermissionsSeeder
 ├── resources/
-│   ├── js/                      # Inertia React components & pages
-│   │   ├── pages/               # Page components (e.g., hello.jsx)
-│   │   └── app.jsx              # Inertia frontend entry point
+│   ├── css/                     # Custom stylesheet & Bootstrap integration
+│   ├── js/
+│   │   ├── inventory/           # Reusable components (AppLayout, ProductForm, NameCrud, permissions hook)
+│   │   ├── pages/               # Inertia React page components
+│   │   │   ├── admin/           # Super Admin dashboard & account management
+│   │   │   ├── auth/            # Fortify auth views (login, register, forgot-password)
+│   │   │   ├── categories/      # Category management views
+│   │   │   ├── products/        # Product inventory views (index, create, edit, show)
+│   │   │   ├── reports/         # Monthly report submission & review views
+│   │   │   └── suppliers/       # Supplier management views
+│   │   └── app.jsx              # Inertia React entry point (createInertiaApp)
 │   └── views/
-│       └── app.blade.php        # Root Blade template for Inertia
-├── routes/
-│   └── web.php                  # Web application routes
-└── vite.config.js               # Vite + React + Laravel bundler configuration
+│       └── app.blade.php        # Root HTML template hosting Inertia & Vite
+└── routes/                      # Modular route definitions
+    ├── admin.php                # Super admin routes (role:super-admin)
+    ├── categories.php           # Category resource routes
+    ├── products.php             # Product resource routes
+    ├── reports.php              # Monthly report routes
+    ├── suppliers.php            # Supplier resource routes
+    └── web.php                  # Main entry route aggregator
 ```
 
 ---
@@ -201,14 +222,14 @@ composer run dev
 ## 💡 Troubleshooting & Windows Tips
 
 - **Laragon PATH issues (`'php'` or `'composer'` not recognized)**:
-  If running outside the Laragon terminal, temporarily append Laragon's binaries to your PowerShell session:
+  Run this one-liner in your PowerShell session to temporarily add Laragon's binaries to your terminal PATH:
   ```powershell
   $env:Path += ";C:\laragon\bin\php\php-8.3.30-Win32-vs16-x64;C:\laragon\bin\composer"
   ```
-  *(Or use the built-in **Terminal** button directly inside Laragon).*
+  *(Or use the built-in **Terminal** button in the Laragon app window).*
 
 - **`The [pcntl] extension is required to run Pail`**:
-  Laravel Pail is a Linux-only real-time log viewer. On Windows, `php artisan pail` should not be included in the `dev` script in `composer.json`.
+  Laravel Pail is a Linux-only real-time log viewer. On Windows, `php artisan pail` has been removed from the `dev` script in `composer.json` to prevent crashes.
 
-- **500 Server Error on First Run**:
-  Ensure you ran `php artisan key:generate` to generate the `APP_KEY` in your `.env` file.
+- **Composer PHP Version Mismatch (`platform-check`)**:
+  If Composer warns about packages requiring PHP 8.4+, `"platform-check": false` is configured in `composer.json` to allow Laragon's PHP 8.3.30 to run smoothly.
