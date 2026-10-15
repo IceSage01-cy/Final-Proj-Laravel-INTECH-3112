@@ -1,11 +1,188 @@
-@import 'tailwindcss';
+   @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&display=swap');
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+   @layer theme, base, bootstrap, components, utilities;
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+   @import 'bootstrap/dist/css/bootstrap.min.css' layer(bootstrap);
+   @import "tailwindcss";
+
+   @theme {
+       --color-navy: #1B2A44;
+       --color-navy-dark: #142033;
+       --color-gold: #8A6A2F;
+       --color-paper: #F4F4F2;
+   }
+
+:root {
+    --navy: #1B2A44;
+    --gold: #8A6A2F;
+    --paper: #F4F4F2;
 }
+
+body {
+    background: var(--paper);
+}
+
+h1, h2, h3, h5, .modal-title {
+    font-family: 'Source Serif 4', Georgia, serif;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--navy);
+    --bs-btn-border-color: var(--navy);
+    --bs-btn-hover-bg: #142033;
+    --bs-btn-hover-border-color: #142033;
+    --bs-btn-active-bg: #142033;
+    --bs-btn-active-border-color: #142033;
+    --bs-btn-disabled-bg: var(--navy);
+    --bs-btn-disabled-border-color: var(--navy);
+}
+
+/* Login page */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+}
+
+.login-card {
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.login-header {
+    background: var(--navy);
+    padding: 2rem;
+    text-align: center;
+}
+
+/* Header band + page frame */
+.app-panel {
+    border: 1px solid rgba(0, 0, 0, .125);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.app-header {
+    background: var(--navy);
+    border: none;
+    border-radius: 0;
+}
+.app-header .card-body {
+    padding-top: 2.25rem;
+    padding-bottom: 2.25rem;
+}
+.app-panel .card {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.btn-outline-light {
+    --bs-btn-hover-color: var(--navy);
+    --bs-btn-active-color: var(--navy);
+}
+
+/* Navy table header (set through Bootstrap's table variables) */
+.table-primary {
+    --bs-table-bg: var(--navy);
+    --bs-table-color: #fff;
+    --bs-table-border-color: #2c3e5c;
+}
+
+/* Highlighted rows */
+.low-stock-row { --bs-table-bg: #FDECD3; }
+.critical-stock-row { --bs-table-bg: #FADBDE; }
+
+/* Badges */
+.badge-status-ok { background-color: #1E8E5A; }
+.badge-status-low { background-color: #D97706; }
+.badge-status-out { background-color: #DC3545; }
+.badge-threshold { background-color: #6c757d; }
+.threshold-badge { font-size: .7rem; padding: 2px 8px; }
+
+/* Admin dashboard */
+.stat-card {
+    border: 1px solid rgba(0, 0, 0, .08);
+    background: #fff;
+    padding: 1rem;
+    text-align: center;
+}
+.stat-card small {
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-size: .72rem;
+}
+.stat-card h3 {
+    margin: .25rem 0 0;
+    font-weight: 700;
+    color: var(--navy);
+}
+h5.section-title {
+    font-family: 'Source Serif 4', Georgia, serif;
+    border-left: 1px solid var(--gold);
+    padding-left: .6rem;
+}
+
+/* Login page (split screen) */
+.login-split {
+    min-height: 100vh;
+    display: flex;
+}
+.login-aside {
+    flex: 1 1 50%;
+    background: var(--navy);
+    color: #fff;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.login-aside h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.login-main {
+    flex: 1 1 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+.login-form-wrap {
+    width: 100%;
+    max-width: 384px;
+}
+.login-form-wrap .form-control {
+    padding: .75rem;
+    border-radius: .5rem;
+}
+@media (max-width: 991.98px) {
+    .login-aside { display: none; }
+}
+
+   /* Header buttons: always readable on hover */
+.app-header a,
+.app-header .btn {
+   text-decoration: none;
+}
+.app-header a:hover,
+.app-header .btn:hover,
+.app-header a:focus-visible,
+.app-header .btn:focus-visible {
+    background-color: white;
+    border-color: white;
+    color: var(--navy);
+}
+
+   /* Header buttons: readable on hover (Bootstrap's .text-white is !important) */
+   @layer bootstrap {
+       .app-header a:hover,
+       .app-header a:focus-visible,
+       .app-header .btn:hover,
+       .app-header .btn:focus-visible {
+           background-color: #fff !important;
+           border-color: #fff !important;
+           color: var(--navy) !important;
+       }
+   }
