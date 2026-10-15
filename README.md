@@ -19,7 +19,7 @@ This application manages product inventories, categories, suppliers, and user ro
 - **Backend Framework**: [Laravel 12](https://laravel.com/) (PHP ^8.3)
 - **Frontend SPA Bridge**: [Inertia.js 2.x](https://inertiajs.com/)
 - **Frontend Framework**: [React 19](https://react.dev/)
-- **CSS / Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **CSS / Styling**: [Tailwind CSS v4](https://tailwindcss.com/)/[Bootstrap](https://getbootstrap.com)
 - **Build Tool**: [Vite](https://vitejs.dev/)
 - **Database**: MySQL / MariaDB (via Laragon, XAMPP, or native install)
 
