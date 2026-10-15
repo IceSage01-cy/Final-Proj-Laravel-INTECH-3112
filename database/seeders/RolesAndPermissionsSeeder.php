@@ -97,7 +97,7 @@ class RolesAndPermissionsSeeder extends Seeder
     private function seedAccounts(): void
     {
         $demoAccounts = [
-            'SuperAdmin' => self::ADMIN,
+            'Admin' => self::ADMIN,
             'Manager' => self::PRODUCT_MANAGER,
             'Employee' => self::EMPLOYEE,
         ];
