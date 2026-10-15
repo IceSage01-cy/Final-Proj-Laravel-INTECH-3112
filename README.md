@@ -63,12 +63,12 @@ git clone https://github.com/IceSage01-cy/Final-Proj-Laravel-INTECH-3112.git
 cd Final-Proj-Laravel-INTECH-3112
 ```
 
-### 2. Switch to the Working Branch
+### 2. Ensure You Are on the Main Branch
 
-Check out the branch containing the full Spatie RBAC and Fortify implementation:
+Ensure you are on the `main` branch (the default branch upon cloning):
 
 ```bash
-git checkout spatie-role
+git checkout main
 ```
 
 ---
